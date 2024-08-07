@@ -43,7 +43,7 @@ func (u testUsecase) TestUsecase(r *http.Request) *helper.WebResponse[interface{
 	// u.Log.Errorf("sukses %v", response)
 	// u.Log.Log(slog.ErrorLevel, "qwqwqqw")
 	slog.Errorf("%v", "qwqwqww")
-	slog.Infof("sukses %v", response)
+	slog.Infof("sukses %+v", response)
 
 	return response
 }
