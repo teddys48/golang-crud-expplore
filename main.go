@@ -8,25 +8,25 @@ import (
 
 func main() {
 	viperConfig := config.NewViper()
-	log := config.NewLogger()
+	config.NewLogger()
 	db := config.NewDatabase(viperConfig)
 	validate := config.NewValidator(viperConfig)
 	redis := config.NewRedisConfig(viperConfig)
 	route := config.NewRoute()
 
-	mux := http.NewServeMux()
+	// mux := http.NewServeMux()
 
 	config.App(&config.AppConfig{
-		DB:       db,
-		Log:      log,
+		DB: db,
+		// Log:      log,
 		Validate: validate,
 		Config:   viperConfig,
 		Redis:    redis,
 		Route:    route,
 	})
 
-	log.Info("Starting apps...")
-	err := http.ListenAndServe(":7000", mux)
+	// log.Info("Starting apps...")
+	err := http.ListenAndServe(":7000", nil)
 	if err != nil {
 		panic(err)
 	}

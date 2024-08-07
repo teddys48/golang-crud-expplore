@@ -3,9 +3,9 @@ module github.com/teddys48/kmpro
 go 1.21.1
 
 require (
+	github.com/go-chi/chi/v5 v5.1.0
 	github.com/go-playground/validator/v10 v10.22.0
 	github.com/gookit/slog v0.5.6
-	github.com/gorilla/mux v1.8.1
 	github.com/redis/go-redis/v9 v9.6.1
 	github.com/spf13/viper v1.19.0
 	gorm.io/driver/postgres v1.5.9

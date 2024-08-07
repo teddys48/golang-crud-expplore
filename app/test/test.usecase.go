@@ -16,8 +16,8 @@ type TestUsecase interface {
 }
 
 type testUsecase struct {
-	DB             *gorm.DB
-	Log            *slog.Logger
+	DB *gorm.DB
+	// Log            *slog.Logger
 	Validate       *validator.Validate
 	TestRepository TestRepository
 	Config         *viper.Viper
@@ -26,8 +26,8 @@ type testUsecase struct {
 
 func NewTestUsecase(db *gorm.DB, log *slog.Logger, validate *validator.Validate, config *viper.Viper, redis *redis.Client, TestRepository TestRepository) TestUsecase {
 	return &testUsecase{
-		DB:             db,
-		Log:            log,
+		DB: db,
+		// Log:            log,
 		Validate:       validate,
 		TestRepository: TestRepository,
 		Config:         config,
@@ -39,6 +39,11 @@ func (u testUsecase) TestUsecase(r *http.Request) *helper.WebResponse[interface{
 	response := new(helper.WebResponse[interface{}])
 
 	response = helper.Response(0, "success", nil)
+
+	// u.Log.Errorf("sukses %v", response)
+	// u.Log.Log(slog.ErrorLevel, "qwqwqqw")
+	slog.Errorf("%v", "qwqwqww")
+	slog.Infof("sukses %v", response)
 
 	return response
 }

@@ -1,9 +1,11 @@
 package config
 
-import "github.com/gorilla/mux"
+import (
+	"github.com/go-chi/chi/v5"
+)
 
-func NewRoute() *mux.Router {
-	r := mux.NewRouter()
+func NewRoute() *chi.Mux {
+	r := chi.NewRouter()
 
 	return r
 }
