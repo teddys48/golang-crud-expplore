@@ -9,6 +9,7 @@ import (
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {
+	mux := http.NewServeMux()
 	godotenv.Load()
 	viperConfig := config.NewViper()
 	config.NewLogger()
@@ -16,8 +17,6 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	validate := config.NewValidator(viperConfig)
 	redis := config.NewRedisConfig(viperConfig)
 	route := config.NewRoute()
-
-	mux := http.NewServeMux()
 
 	config.App(&config.AppConfig{
 		DB: db,
