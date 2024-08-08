@@ -5,7 +5,6 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/teddys48/kmpro/app/test"
-	"github.com/teddys48/kmpro/helper"
 )
 
 type RouteConfig struct {
@@ -30,7 +29,7 @@ func (c *RouteConfig) AuthRoute() {
 }
 
 func (c *RouteConfig) GuestRoute() {
-	c.Route.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		helper.ReturnResponse(w, "Welcome!")
-	})
+	// c.Route.Get("/", func(w http.ResponseWriter, r *http.Request) {
+	// 	helper.ReturnResponse(w, "Welcome!")
+	// })
 }
