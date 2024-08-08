@@ -1,0 +1,40 @@
+{
+    "app": {
+      "name": "C-Access Authorization",
+      "env": "development"
+    },
+    "web": {
+      "prefork": false,
+      "port": 3003
+    },
+    "database": {
+      "username": "postgres",
+      "password": "galau712",
+      "host": "localhost",
+      "port": 5432,
+      "name": "C-ACCESS",
+      "pool": {
+        "idle": 10,
+        "max": 100,
+        "lifetime": 300
+      }
+    },
+    "jwt": {
+      "tokenExpiration": 24,
+      "refreshTokenExpiration": 48,
+      "tokenSecretKey": "101001A00C2001A0483001A0883001A0",
+      "refreshTokenSecretKey": "101001A00C2001A0483001A0883001A0800082008300800081008200"
+    },
+    "encrypt": {
+      "key": "3DyMyKUDlWKEKwSxGbbx7fvBaboeJeB="
+    },
+    "redis": {
+      "address": "localhost:6379",
+      "password": "galau712"
+    },
+    "loki": {
+      "address": "http://172.17.3.13:3100/loki/api/v1/push",
+      "label": "authentication"
+    }
+  }
+  

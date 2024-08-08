@@ -1,0 +1,8 @@
+logs
+./logs
+
+# config.json
+# ./config.json
+
+.env
+./.env
