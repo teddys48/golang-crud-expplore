@@ -1,16 +1,17 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/joho/godotenv"
+	. "github.com/tbxark/g4vercel"
 	"github.com/teddys48/kmpro/config"
 	"github.com/teddys48/kmpro/helper"
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {
-	mux := http.NewServeMux()
+	server := New()
 	godotenv.Load()
 	viperConfig := config.NewViper()
 	config.NewLogger()
@@ -32,14 +33,32 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		helper.ReturnResponse(w, "Welcome!")
 	})
 
-	mux.Handle("/", route)
-
 	// mux.ServeHTTP(w, r)
 
 	// log.Info("Starting apps...")
-	port := os.Getenv("appPort")
-	err := http.ListenAndServe(":"+port, nil)
-	if err != nil {
-		panic(err)
-	}
+	// port := os.Getenv("appPort")
+	// err := http.ListenAndServe(":"+port, nil)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	server.Use(Recovery(func(err interface{}, c *Context) {
+		if httpError, ok := err.(HttpError); ok {
+			c.JSON(httpError.Status, H{
+				"message": httpError.Error(),
+			})
+		} else {
+			message := fmt.Sprintf("%s", err)
+			c.JSON(500, H{
+				"message": message,
+			})
+		}
+	}))
+	server.GET("/", func(context *Context) {
+		context.JSON(200, H{
+			"message": "OK",
+		})
+	})
+
+	server.Handle(w, r)
 }
