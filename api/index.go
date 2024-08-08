@@ -2,7 +2,6 @@ package handler
 
 import (
 	"net/http"
-	"os"
 
 	"github.com/joho/godotenv"
 	"github.com/teddys48/kmpro/config"
@@ -18,7 +17,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	redis := config.NewRedisConfig(viperConfig)
 	route := config.NewRoute()
 
-	// mux := http.NewServeMux()
+	mux := http.NewServeMux()
 
 	config.App(&config.AppConfig{
 		DB: db,
@@ -33,10 +32,12 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		helper.ReturnResponse(w, "Welcome!")
 	})
 
+	mux.ServeHTTP(w, r)
+
 	// log.Info("Starting apps...")
-	port := os.Getenv("appPort")
-	err := http.ListenAndServe(":"+port, nil)
-	if err != nil {
-		panic(err)
-	}
+	// port := os.Getenv("appPort")
+	// err := http.ListenAndServe(":"+port, nil)
+	// if err != nil {
+	// 	panic(err)
+	// }
 }
