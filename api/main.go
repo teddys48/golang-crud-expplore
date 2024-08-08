@@ -26,7 +26,8 @@ func main() {
 	})
 
 	// log.Info("Starting apps...")
-	err := http.ListenAndServe(":7000", nil)
+	port := viperConfig.GetString("web.port")
+	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		panic(err)
 	}
