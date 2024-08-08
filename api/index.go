@@ -4,34 +4,31 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/joho/godotenv"
 	. "github.com/tbxark/g4vercel"
-	"github.com/teddys48/kmpro/config"
-	"github.com/teddys48/kmpro/helper"
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {
 	server := New()
-	godotenv.Load()
-	viperConfig := config.NewViper()
-	config.NewLogger()
-	db := config.NewDatabase(viperConfig)
-	validate := config.NewValidator(viperConfig)
-	redis := config.NewRedisConfig(viperConfig)
-	route := config.NewRoute()
+	// godotenv.Load()
+	// viperConfig := config.NewViper()
+	// config.NewLogger()
+	// db := config.NewDatabase(viperConfig)
+	// validate := config.NewValidator(viperConfig)
+	// redis := config.NewRedisConfig(viperConfig)
+	// route := config.NewRoute()
 
-	config.App(&config.AppConfig{
-		DB: db,
-		// Log:      log,
-		Validate: validate,
-		Config:   viperConfig,
-		Redis:    redis,
-		Route:    route,
-	})
+	// config.App(&config.AppConfig{
+	// 	DB: db,
+	// 	// Log:      log,
+	// 	Validate: validate,
+	// 	Config:   viperConfig,
+	// 	Redis:    redis,
+	// 	Route:    route,
+	// })
 
-	route.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		helper.ReturnResponse(w, "Welcome!")
-	})
+	// route.Get("/", func(w http.ResponseWriter, r *http.Request) {
+	// 	helper.ReturnResponse(w, "Welcome!")
+	// })
 
 	// mux.ServeHTTP(w, r)
 
