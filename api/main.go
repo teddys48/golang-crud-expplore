@@ -1,13 +1,21 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/teddys48/kmpro/config"
 	"github.com/teddys48/kmpro/helper"
 )
 
+func Handler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "<h1>Hello from Go!</h1>")
+}
+
 func main() {
+	godotenv.Load()
 	viperConfig := config.NewViper()
 	config.NewLogger()
 	db := config.NewDatabase(viperConfig)
@@ -31,7 +39,7 @@ func main() {
 	})
 
 	// log.Info("Starting apps...")
-	port := viperConfig.GetString("web.port")
+	port := os.Getenv("appPort")
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		panic(err)

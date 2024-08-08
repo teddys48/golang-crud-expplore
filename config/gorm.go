@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 	"log"
-	"time"
+	"os"
 
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
@@ -11,16 +11,13 @@ import (
 )
 
 func NewDatabase(viper *viper.Viper) *gorm.DB {
-	username := viper.GetString("database.username")
-	password := viper.GetString("database.password")
-	host := viper.GetString("database.host")
-	port := viper.GetInt("database.port")
-	database := viper.GetString("database.name")
-	idleConnection := viper.GetInt("database.pool.idle")
-	maxConnection := viper.GetInt("database.pool.max")
-	maxLifeTimeConnection := viper.GetInt("database.pool.lifetime")
+	username := os.Getenv("username")
+	password := os.Getenv("password")
+	host := os.Getenv("host")
+	port := os.Getenv("port")
+	database := os.Getenv("name")
 
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable TimeZone=Asia/Jakarta", host, username, password, database, port)
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Jakarta", host, username, password, database, port)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		// Logger: logger.New(&logrusWriter{Logger: log}, logger.Config{
@@ -35,14 +32,14 @@ func NewDatabase(viper *viper.Viper) *gorm.DB {
 		log.Fatalf("failed to connect database: %v", err)
 	}
 
-	connection, err := db.DB()
+	_, err = db.DB()
 	if err != nil {
 		log.Fatalf("failed to connect database: %v", err)
 	}
 
-	connection.SetMaxIdleConns(idleConnection)
-	connection.SetMaxOpenConns(maxConnection)
-	connection.SetConnMaxLifetime(time.Second * time.Duration(maxLifeTimeConnection))
+	// connection.SetMaxIdleConns(idleConnection)
+	// connection.SetMaxOpenConns(maxConnection)
+	// connection.SetConnMaxLifetime(time.Second * time.Duration(maxLifeTimeConnection))
 
 	return db
 }
