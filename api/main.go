@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/teddys48/kmpro/config"
+	"github.com/teddys48/kmpro/helper"
 )
 
 func main() {
@@ -23,6 +24,10 @@ func main() {
 		Config:   viperConfig,
 		Redis:    redis,
 		Route:    route,
+	})
+
+	route.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		helper.ReturnResponse(w, "Welcome!")
 	})
 
 	// log.Info("Starting apps...")
