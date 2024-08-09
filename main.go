@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"os"
 
@@ -9,7 +10,18 @@ import (
 	"github.com/teddys48/kmpro/helper"
 )
 
+func StartNonTLSServer() {
+	mux := new(http.ServeMux)
+	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Redirecting to https://localhost/")
+		http.Redirect(w, r, "https://localhost/", http.StatusTemporaryRedirect)
+	}))
+
+	http.ListenAndServe(":8070", mux)
+}
+
 func main() {
+	// go StartNonTLSServer()
 	godotenv.Load()
 	viperConfig := config.NewViper()
 	config.NewLogger()
@@ -35,7 +47,7 @@ func main() {
 
 	// log.Info("Starting apps...")
 	port := os.Getenv("appPort")
-	err := http.ListenAndServe(":"+port, nil)
+	err := http.ListenAndServeTLS(":"+port, "server.crt", "server.key", nil)
 	if err != nil {
 		panic(err)
 	}
