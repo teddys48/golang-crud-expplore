@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/joho/godotenv"
 	"github.com/teddys48/kmpro/config"
@@ -46,7 +45,7 @@ func main() {
 	})
 
 	// log.Info("Starting apps...")
-	port := os.Getenv("appPort")
+	port := viperConfig.GetString("web.port")
 	err := http.ListenAndServeTLS(":"+port, "server.crt", "server.key", nil)
 	if err != nil {
 		panic(err)
