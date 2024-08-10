@@ -24,10 +24,10 @@ func NewDatabase(viper *viper.Viper) *gorm.DB {
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		// Logger: logger.New(&logrusWriter{Logger: log}, logger.Config{
-		// 	SlowThreshold:             time.Second * 5,
-		// 	Colorful:                  false,
-		// 	IgnoreRecordNotFoundError: true,
-		// 	ParameterizedQueries:      true,
+		// SlowThreshold:             time.Second * 5,
+		// Colorful:                  false,
+		// IgnoreRecordNotFoundError: true,
+		// ParameterizedQueries:      true,
 		// 	LogLevel:                  logger.Info,
 		// }),
 	})

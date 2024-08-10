@@ -9,6 +9,7 @@ import (
 	"github.com/gookit/slog"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
+	"github.com/teddys48/kmpro/app/auth"
 	"github.com/teddys48/kmpro/app/test"
 	"github.com/teddys48/kmpro/middleware"
 	"github.com/teddys48/kmpro/route"
@@ -45,10 +46,15 @@ func App(config *AppConfig) {
 	testUsecase := test.NewTestUsecase(config.DB, config.Log, config.Validate, config.Config, config.Redis, testRepo)
 	testHandler := test.NewTestHandler(testUsecase)
 
+	authRepo := auth.NewAuthRepository(config.Config)
+	authUsecase := auth.NewAuthUseCase(config.DB, config.Validate, authRepo, config.Config, config.Redis)
+	authHandler := auth.NewAuthHandler(authUsecase)
+
 	routeConfig := route.RouteConfig{
 		AuthMiddleware: authMiddleware,
 		Route:          config.Route,
 		TestHandler:    testHandler,
+		AuthHandler:    authHandler,
 	}
 
 	routeConfig.Setup()

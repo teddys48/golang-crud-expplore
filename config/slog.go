@@ -19,8 +19,8 @@ func NewLogger() {
 	// })
 	allLog := handler.MustFileHandler("./logs/log", handler.WithRotateTime(rotatefile.EveryDay), handler.WithLogLevels(slog.AllLevels), func(c *handler.Config) {
 		// c.RotateWriter()
-		// c.BackupTime = 1
-		// c.RotateMode = rotatefile.ModeCreate
+		c.BackupTime = 1
+		c.RotateMode = rotatefile.ModeCreate
 		// c.CreateHandler()
 		c.RotateMode = rotatefile.RotateMode(1)
 		c.RotateMode = rotatefile.ModeCreate

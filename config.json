@@ -8,10 +8,10 @@
       "port": 8080
     },
     "database": {
-      "username": "postgres.tfsokqotygvktblzicaz",
-      "password": "6DckqKaL9nnO4LLW",
-      "host": "aws-0-us-east-1.pooler.supabase.com",
-      "port": 6543,
+      "username": "postgres",
+      "password": "galau712",
+      "host": "3.25.193.79",
+      "port": 5432,
       "name": "postgres",
       "pool": {
         "idle": 10,

@@ -2,10 +2,11 @@ package test
 
 import (
 	"github.com/gookit/slog"
+	"gorm.io/gorm"
 )
 
 type TestRepository interface {
-	TestRepository() error
+	TestRepository(tx *gorm.DB) error
 }
 
 type testRepository struct {
@@ -18,6 +19,6 @@ func NewTestRepository(log *slog.Logger) TestRepository {
 	}
 }
 
-func (r testRepository) TestRepository() error {
-	return nil
+func (r testRepository) TestRepository(db *gorm.DB) error {
+	return db.Table("auth.users").Error
 }
