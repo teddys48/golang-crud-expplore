@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/joho/godotenv"
 	"github.com/teddys48/kmpro/config"
 	"github.com/teddys48/kmpro/helper"
 )
@@ -21,7 +20,7 @@ func StartNonTLSServer() {
 
 func main() {
 	// go StartNonTLSServer()
-	godotenv.Load()
+	// godotenv.Load()
 	viperConfig := config.NewViper()
 	config.NewLogger()
 	db := config.NewDatabase(viperConfig)
