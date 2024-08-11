@@ -31,7 +31,7 @@ func NewAuthMiddleware(log *slog.Logger, config *viper.Viper, redis *redis.Clien
 
 			response := &helper.WebResponse[interface{}]{}
 
-			token := r.Header.Get("Authorization")[7:]
+			getToken := r.Header.Get("Authorization")
 
 			key, err := helper.PublicKey()
 			if err != nil {
@@ -42,13 +42,15 @@ func NewAuthMiddleware(log *slog.Logger, config *viper.Viper, redis *redis.Clien
 				helper.ReturnResponse(w, response)
 			}
 
-			if token == "" {
+			if getToken == "" {
 				response = helper.Response(401, "token not found", nil)
 
 				log.Warnf("[RESPONSE MIDDLEWARE-AUTH] %+v", "token not found")
 
 				helper.ReturnResponse(w, response)
 			}
+
+			token := getToken[7:]
 
 			tok, err := jwt.ParseWithClaims(token, &ClaimsToken{}, func(jwtToken *jwt.Token) (interface{}, error) {
 				if _, ok := jwtToken.Method.(*jwt.SigningMethodRSA); !ok {
