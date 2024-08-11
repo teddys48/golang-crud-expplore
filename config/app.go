@@ -33,6 +33,17 @@ func App(config *AppConfig) {
 	// 		r.Header.Add("Content-Type", "application/json")
 	// 	})
 	// })
+	config.Route.Use(func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// w.Header().Set("Content-Type", "application/json")
+			if r.Method == "OPTIONS" {
+				w.WriteHeader(200)
+				h.ServeHTTP(w, r)
+			} else {
+				h.ServeHTTP(w, r)
+			}
+		})
+	})
 	authMiddleware := middleware.NewAuthMiddleware(config.Log, config.Config, config.Redis, config.Route)
 	config.Route.Use(chiMiddleware.Logger)
 
