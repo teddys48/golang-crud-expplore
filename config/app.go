@@ -38,8 +38,14 @@ func App(config *AppConfig) {
 			// w.Header().Set("Content-Type", "application/json")
 			if r.Method == "OPTIONS" {
 				w.WriteHeader(200)
+				w.Header().Set("Access-Control-Allow-Origin", "*")
+				w.Header().Set("Access-Control-Allow-Methods", "*")
+				w.Header().Set("Access-Control-Allow-Headers", "*")
 				h.ServeHTTP(w, r)
 			} else {
+				w.Header().Set("Access-Control-Allow-Origin", "*")
+				w.Header().Set("Access-Control-Allow-Methods", "*")
+				w.Header().Set("Access-Control-Allow-Headers", "*")
 				h.ServeHTTP(w, r)
 			}
 		})
