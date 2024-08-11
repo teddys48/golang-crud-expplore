@@ -32,7 +32,7 @@ func (c *RouteConfig) AuthRoute() {
 	// })
 	// a := c.Route.With(c.AuthMiddleware)
 	// a.Get("/test", c.TestHandler.TestHandler)
-	c.Route.With(c.AuthMiddleware).Post("/api/auth/refresh-token", c.AuthHandler.RefreshToken)
+	c.Route.With(c.AuthMiddleware).Get("/api/auth/refresh-token", c.AuthHandler.RefreshToken)
 }
 
 func (c *RouteConfig) GuestRoute() {
