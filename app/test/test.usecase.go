@@ -38,7 +38,7 @@ func NewTestUsecase(db *gorm.DB, log *slog.Logger, validate *validator.Validate,
 func (u testUsecase) TestUsecase(r *http.Request) *helper.WebResponse[interface{}] {
 	response := new(helper.WebResponse[interface{}])
 
-	response = helper.Response(0, "success", nil)
+	response = helper.Response("00", "success", nil)
 
 	// u.Log.Errorf("sukses %v", response)
 	// u.Log.Log(slog.ErrorLevel, "qwqwqqw")

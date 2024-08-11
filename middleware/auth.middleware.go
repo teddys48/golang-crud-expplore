@@ -35,7 +35,7 @@ func NewAuthMiddleware(log *slog.Logger, config *viper.Viper, redis *redis.Clien
 
 			key, err := helper.PublicKey()
 			if err != nil {
-				response = helper.Response(500, err.Error(), nil)
+				response = helper.Response("500", err.Error(), nil)
 
 				log.Warnf("[RESPONSE MIDDLEWARE-AUTH]%+v", err.Error())
 
@@ -43,7 +43,7 @@ func NewAuthMiddleware(log *slog.Logger, config *viper.Viper, redis *redis.Clien
 			}
 
 			if getToken == "" {
-				response = helper.Response(401, "token not found", nil)
+				response = helper.Response("401", "token not found", nil)
 
 				log.Warnf("[RESPONSE MIDDLEWARE-AUTH] %+v", "token not found")
 
@@ -62,7 +62,7 @@ func NewAuthMiddleware(log *slog.Logger, config *viper.Viper, redis *redis.Clien
 			})
 
 			if err != nil {
-				response = helper.Response(402, err.Error(), nil)
+				response = helper.Response("402", err.Error(), nil)
 
 				log.Warnf("[RESPONSE MIDDLEWARE-AUTH] %+v", err.Error())
 
@@ -71,7 +71,7 @@ func NewAuthMiddleware(log *slog.Logger, config *viper.Viper, redis *redis.Clien
 
 			claims, ok := tok.Claims.(*ClaimsToken)
 			if !ok || !tok.Valid {
-				response = helper.Response(403, "invalid token", nil)
+				response = helper.Response("403", "invalid token", nil)
 
 				log.Warnf("[RESPONSE MIDDLEWARE-AUTH] %+v", "invalid token")
 
@@ -82,7 +82,7 @@ func NewAuthMiddleware(log *slog.Logger, config *viper.Viper, redis *redis.Clien
 
 			userID, err := helper.Decrypt(claims.UserID, []byte(decryptKey))
 			if err != nil {
-				response = helper.Response(500, err.Error(), nil)
+				response = helper.Response("500", err.Error(), nil)
 
 				log.Warnf("[RESPONSE MIDDLEWARE-AUTH] %+v", err.Error())
 
@@ -106,7 +106,7 @@ func NewRefreshTokenMiddleware(log *slog.Logger, config *viper.Viper, redis *red
 
 			key, err := helper.PublicKey()
 			if err != nil {
-				response = helper.Response(500, err.Error(), nil)
+				response = helper.Response("500", err.Error(), nil)
 
 				log.Warnf("[RESPONSE MIDDLEWARE-AUTH]%+v", err.Error())
 
@@ -114,7 +114,7 @@ func NewRefreshTokenMiddleware(log *slog.Logger, config *viper.Viper, redis *red
 			}
 
 			if token == "" {
-				response = helper.Response(401, "token not found", nil)
+				response = helper.Response("401", "token not found", nil)
 
 				log.Warnf("[RESPONSE MIDDLEWARE-AUTH] %+v", "token not found")
 
@@ -131,7 +131,7 @@ func NewRefreshTokenMiddleware(log *slog.Logger, config *viper.Viper, redis *red
 			})
 
 			if err != nil {
-				response = helper.Response(402, err.Error(), nil)
+				response = helper.Response("402", err.Error(), nil)
 
 				log.Warnf("[RESPONSE MIDDLEWARE-AUTH] %+v", err.Error())
 
@@ -140,7 +140,7 @@ func NewRefreshTokenMiddleware(log *slog.Logger, config *viper.Viper, redis *red
 
 			claims, ok := tok.Claims.(*ClaimsToken)
 			if !ok || !tok.Valid {
-				response = helper.Response(403, "invalid token", nil)
+				response = helper.Response("403", "invalid token", nil)
 
 				log.Warnf("[RESPONSE MIDDLEWARE-AUTH] %+v", "invalid token")
 
@@ -151,7 +151,7 @@ func NewRefreshTokenMiddleware(log *slog.Logger, config *viper.Viper, redis *red
 
 			userID, err := helper.Decrypt(claims.UserID, []byte(decryptKey))
 			if err != nil {
-				response = helper.Response(500, err.Error(), nil)
+				response = helper.Response("500", err.Error(), nil)
 
 				log.Warnf("[RESPONSE MIDDLEWARE-AUTH] %+v", err.Error())
 

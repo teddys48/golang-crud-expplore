@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func Response(code int, message string, data any) *WebResponse[interface{}] {
+func Response(code string, message string, data any) *WebResponse[interface{}] {
 	res := new(WebResponse[interface{}])
 
 	// if code == 0 {

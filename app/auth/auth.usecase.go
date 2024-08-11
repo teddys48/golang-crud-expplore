@@ -46,7 +46,7 @@ func (u authUseCase) Login(r *http.Request) *helper.WebResponse[interface{}] {
 
 	err := helper.ValidateRequest(r, u.Validate, request)
 	if err != nil {
-		response = helper.Response(500, err.Error(), nil)
+		response = helper.Response("500", err.Error(), nil)
 		return response
 	}
 
@@ -55,28 +55,28 @@ func (u authUseCase) Login(r *http.Request) *helper.WebResponse[interface{}] {
 	user := new(LoginUsers)
 	err = u.AuthRepository.CheckUsersByUsername(tx, user, request.Username)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		response = helper.Response(400, "User not found", nil)
+		response = helper.Response("400", "User not found", nil)
 		return response
 	} else if err != nil {
-		response = helper.Response(500, err.Error(), nil)
+		response = helper.Response("500", err.Error(), nil)
 		return response
 	}
 
 	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password)); err != nil {
-		response = helper.Response(400, "Wrong password", nil)
+		response = helper.Response("400", "Wrong password", nil)
 		return response
 	}
 
 	encryptKey := u.Config.GetString("encrypt.key")
 	jwtKey, err := helper.PrivateKey()
 	if err != nil {
-		response = helper.Response(500, err.Error(), nil)
+		response = helper.Response("500", err.Error(), nil)
 		return response
 	}
 
 	userIDEnc, err := helper.Encrypt([]byte(fmt.Sprint(user.ID)), []byte(encryptKey))
 	if err != nil {
-		response = helper.Response(500, err.Error(), nil)
+		response = helper.Response("500", err.Error(), nil)
 		return response
 	}
 
@@ -129,11 +129,11 @@ func (u authUseCase) Login(r *http.Request) *helper.WebResponse[interface{}] {
 	}
 
 	if err != nil {
-		response = helper.Response(500, err.Error(), nil)
+		response = helper.Response("500", err.Error(), nil)
 		return response
 	}
 
-	response = helper.Response(00, "success", LoginResponse{AccessToken: accessToken, RefreshToken: refreshToken})
+	response = helper.Response("00", "success", LoginResponse{AccessToken: accessToken, RefreshToken: refreshToken})
 	return response
 }
 
@@ -144,13 +144,13 @@ func (u authUseCase) RefreshToken(r *http.Request) *helper.WebResponse[interface
 	encryptKey := u.Config.GetString("encrypt.key")
 	jwtKey, err := helper.PrivateKey()
 	if err != nil {
-		response = helper.Response(500, err.Error(), nil)
+		response = helper.Response("500", err.Error(), nil)
 		return response
 	}
 
 	userIDEnc, err := helper.Encrypt([]byte(fmt.Sprint(userID)), []byte(encryptKey))
 	if err != nil {
-		response = helper.Response(500, err.Error(), nil)
+		response = helper.Response("500", err.Error(), nil)
 		return response
 	}
 
@@ -203,10 +203,10 @@ func (u authUseCase) RefreshToken(r *http.Request) *helper.WebResponse[interface
 	}
 
 	if err != nil {
-		response = helper.Response(500, err.Error(), nil)
+		response = helper.Response("500", err.Error(), nil)
 		return response
 	}
 
-	response = helper.Response(00, "success", LoginResponse{AccessToken: accessToken, RefreshToken: refreshToken})
+	response = helper.Response("00", "success", LoginResponse{AccessToken: accessToken, RefreshToken: refreshToken})
 	return response
 }
