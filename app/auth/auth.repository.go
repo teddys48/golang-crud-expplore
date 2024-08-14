@@ -7,9 +7,6 @@ import (
 
 type AuthRepository interface {
 	CheckUsersByUsername(db *gorm.DB, user *LoginUsers, username string) error
-	// UpdateUsers(db *gorm.DB, user *entity.Users, code string) error
-	// GetUserByEmail(db *gorm.DB, email string, loginBy string) (*UserData, error)
-	// RegisterUserBySso(db *gorm.DB, req RegisterUserRequest) (*UserData, error)
 }
 
 type authRepository struct {

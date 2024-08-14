@@ -21,10 +21,6 @@ type ClaimsData struct {
 	UserID string `json:"user_id"`
 }
 
-type contextKey string
-
-var userKey contextKey = "user_id"
-
 func NewAuthMiddleware(log *slog.Logger, config *viper.Viper, redis *redis.Client, next http.Handler) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -90,7 +86,7 @@ func NewAuthMiddleware(log *slog.Logger, config *viper.Viper, redis *redis.Clien
 			}
 
 			fmt.Println("lewat dong")
-			ctx := context.WithValue(r.Context(), userKey, userID)
+			ctx := context.WithValue(r.Context(), helper.GetContextKey(), string(userID))
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
@@ -159,7 +155,7 @@ func NewRefreshTokenMiddleware(log *slog.Logger, config *viper.Viper, redis *red
 			}
 
 			fmt.Println("lewat dong")
-			ctx := context.WithValue(r.Context(), userKey, userID)
+			ctx := context.WithValue(r.Context(), helper.GetContextKey(), userID)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

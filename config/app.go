@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/teddys48/kmpro/app/auth"
 	"github.com/teddys48/kmpro/app/test"
+	"github.com/teddys48/kmpro/app/users"
 	"github.com/teddys48/kmpro/middleware"
 	"github.com/teddys48/kmpro/route"
 	"gorm.io/gorm"
@@ -67,11 +68,16 @@ func App(config *AppConfig) {
 	authUsecase := auth.NewAuthUseCase(config.DB, config.Validate, authRepo, config.Config, config.Redis)
 	authHandler := auth.NewAuthHandler(authUsecase)
 
+	userRepo := users.Newrepository(config.Config)
+	userUsecase := users.NewUseCase(config.DB, config.Validate, userRepo, config.Config, config.Redis)
+	userHandler := users.NewHandler(userUsecase)
+
 	routeConfig := route.RouteConfig{
 		AuthMiddleware: authMiddleware,
 		Route:          config.Route,
 		TestHandler:    testHandler,
 		AuthHandler:    authHandler,
+		UsersHandler:   userHandler,
 	}
 
 	routeConfig.Setup()

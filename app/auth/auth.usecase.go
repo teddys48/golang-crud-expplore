@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/gookit/slog"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
 	"github.com/teddys48/kmpro/helper"
@@ -44,11 +45,16 @@ func (u authUseCase) Login(r *http.Request) *helper.WebResponse[interface{}] {
 	response := &helper.WebResponse[interface{}]{}
 	request := new(LoginRequest)
 
+	session := helper.GenerateRandomString()
+
 	err := helper.ValidateRequest(r, u.Validate, request)
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
+		slog.Warnf("[%+v] [AUTH LOGIN] RESPONSE : %+v", session, err.Error())
 		return response
 	}
+
+	slog.Infof("[%+v] [AUTH LOGIN] REQUEST : %+v", session, request)
 
 	tx := u.DB.WithContext(r.Context())
 
@@ -56,14 +62,17 @@ func (u authUseCase) Login(r *http.Request) *helper.WebResponse[interface{}] {
 	err = u.AuthRepository.CheckUsersByUsername(tx, user, request.Username)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		response = helper.Response("400", "User not found", nil)
+		slog.Warnf("[%+v] [AUTH LOGIN] RESPONSE : %+v", session, err.Error())
 		return response
 	} else if err != nil {
 		response = helper.Response("500", err.Error(), nil)
+		slog.Warnf("[%+v] [AUTH LOGIN] RESPONSE : %+v", session, err.Error())
 		return response
 	}
 
 	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password)); err != nil {
 		response = helper.Response("400", "Wrong password", nil)
+		slog.Warnf("[%+v] [AUTH LOGIN] RESPONSE : %+v", session, response)
 		return response
 	}
 
@@ -71,12 +80,14 @@ func (u authUseCase) Login(r *http.Request) *helper.WebResponse[interface{}] {
 	jwtKey, err := helper.PrivateKey()
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
+		slog.Warnf("[%+v] [AUTH LOGIN] RESPONSE : %+v", session, err.Error())
 		return response
 	}
 
 	userIDEnc, err := helper.Encrypt([]byte(fmt.Sprint(user.ID)), []byte(encryptKey))
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
+		slog.Warnf("[%+v] [AUTH LOGIN] RESPONSE : %+v", session, err.Error())
 		return response
 	}
 
@@ -130,27 +141,35 @@ func (u authUseCase) Login(r *http.Request) *helper.WebResponse[interface{}] {
 
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
+		slog.Warnf("[%+v] [AUTH LOGIN] RESPONSE : %+v", session, err.Error())
 		return response
 	}
 
 	response = helper.Response("00", "success", LoginResponse{AccessToken: accessToken, RefreshToken: refreshToken})
+	slog.Infof("[%+v] [AUTH LOGIN] RESPONSE : %+v", session, response)
 	return response
 }
 
 func (u authUseCase) RefreshToken(r *http.Request) *helper.WebResponse[interface{}] {
 	response := &helper.WebResponse[interface{}]{}
 	userID := context.Context.Value(r.Context(), "user_id")
+	fmt.Println("user_id", userID)
+	session := helper.GenerateRandomString()
 
 	encryptKey := u.Config.GetString("encrypt.key")
 	jwtKey, err := helper.PrivateKey()
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
+		slog.Warnf("[%+v] [AUTH REFRESH TOKEN] RESPONSE : %+v", session, err.Error())
 		return response
 	}
+
+	slog.Infof("[%+v] [AUTH REFRESH TOKEN] REQUEST : %+v", session, nil)
 
 	userIDEnc, err := helper.Encrypt([]byte(fmt.Sprint(userID)), []byte(encryptKey))
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
+		slog.Warnf("[%+v] [AUTH REFRESH TOKEN] RESPONSE : %+v", session, err.Error())
 		return response
 	}
 
@@ -204,9 +223,11 @@ func (u authUseCase) RefreshToken(r *http.Request) *helper.WebResponse[interface
 
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
+		slog.Warnf("[%+v] [AUTH REFRESH TOKEN] RESPONSE : %+v", session, err.Error())
 		return response
 	}
 
 	response = helper.Response("00", "success", LoginResponse{AccessToken: accessToken, RefreshToken: refreshToken})
+	slog.Warnf("[%+v] [AUTH REFRESH TOKEN] RESPONSE : %+v", session, response)
 	return response
 }

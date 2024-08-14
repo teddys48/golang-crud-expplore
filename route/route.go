@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/teddys48/kmpro/app/auth"
 	"github.com/teddys48/kmpro/app/test"
+	"github.com/teddys48/kmpro/app/users"
 )
 
 type RouteConfig struct {
@@ -13,6 +14,7 @@ type RouteConfig struct {
 	Route          *chi.Mux
 	TestHandler    test.TestHandler
 	AuthHandler    auth.AuthHandler
+	UsersHandler   users.Handler
 }
 
 func (c *RouteConfig) Setup() {
@@ -21,18 +23,14 @@ func (c *RouteConfig) Setup() {
 }
 
 func (c *RouteConfig) AuthRoute() {
-	// prefix := c.Route.Path("/asas").Subrouter().Use()
-	// c.Route.Route("/api", func(r chi.Router) {
-	// 	r.Use(c.AuthMiddleware)
-	// 	r.Get("/test", c.TestHandler.TestHandler)
-	// })
-	// c.Route.Route("/api/", func(r chi.Router) {
-	// 	r.Use(c.AuthMiddleware)
-	// 	r.Post("/auth/refresh-token",)
-	// })
-	// a := c.Route.With(c.AuthMiddleware)
-	// a.Get("/test", c.TestHandler.TestHandler)
 	c.Route.With(c.AuthMiddleware).Get("/api/auth/refresh-token", c.AuthHandler.RefreshToken)
+
+	userRoute := c.Route.With(c.AuthMiddleware)
+	userRoute.Get("/api/users", c.UsersHandler.All)
+	userRoute.Get("/api/users/find", c.UsersHandler.Find)
+	userRoute.Post("/api/users/create", c.UsersHandler.Create)
+	userRoute.Post("/api/users/update", c.UsersHandler.Update)
+	userRoute.Get("/api/users/delete", c.UsersHandler.Delete)
 }
 
 func (c *RouteConfig) GuestRoute() {

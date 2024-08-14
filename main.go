@@ -1,21 +1,27 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 
 	"github.com/teddys48/kmpro/config"
 	"github.com/teddys48/kmpro/helper"
 )
 
-func StartNonTLSServer() {
-	mux := new(http.ServeMux)
-	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Redirecting to https://localhost/")
-		http.Redirect(w, r, "https://localhost/", http.StatusTemporaryRedirect)
-	}))
+func StartNonTLSServer(port string) {
+	err := http.ListenAndServe(":"+port, nil)
+	if err != nil {
+		panic(err)
+	} else {
+		fmt.Printf("Starting server on port %v", port)
+	}
+}
 
-	http.ListenAndServe(":8070", mux)
+func StartTLSServer(port string) {
+	err := http.ListenAndServeTLS(":"+port, "server.crt", "server.key", nil)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func main() {
@@ -45,8 +51,13 @@ func main() {
 
 	// log.Info("Starting apps...")
 	port := viperConfig.GetString("web.port")
-	err := http.ListenAndServeTLS(":"+port, "server.crt", "server.key", nil)
-	if err != nil {
-		panic(err)
+	if viperConfig.GetString("app.env") == "development" {
+		StartNonTLSServer(port)
+	} else {
+		StartTLSServer(port)
 	}
+	// err := http.ListenAndServeTLS(":"+port, "server.crt", "server.key", nil)
+	// if err != nil {
+	// 	panic(err)
+	// }
 }

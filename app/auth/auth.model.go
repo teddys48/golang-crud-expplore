@@ -20,7 +20,7 @@ type ClaimsToken struct {
 
 type LoginUsers struct {
 	ID       int64  `json:"id"`
-	Code     int64  `json:"code"`
+	Code     string `json:"code"`
 	Email    string `json:"email"`
 	Username string `json:"username"`
 	Password string `json:"password"`
