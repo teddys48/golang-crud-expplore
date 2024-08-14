@@ -33,3 +33,14 @@ type RoleDetailData struct {
 	Sort   int    `json:"sort"`
 	Action string `json:"action"`
 }
+
+type RoleCreateRequest struct {
+	Name        string                  `json:"name"`
+	Description string                  `json:"description"`
+	Menu        []RoleCreateRequestMenu `json:"menu"`
+}
+
+type RoleCreateRequestMenu struct {
+	MenuID int64  `json:"menu_id"`
+	Action string `json:"action"`
+}

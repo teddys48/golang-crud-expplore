@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/teddys48/kmpro/app/auth"
 	"github.com/teddys48/kmpro/app/menu"
+	"github.com/teddys48/kmpro/app/role"
 	"github.com/teddys48/kmpro/app/test"
 	"github.com/teddys48/kmpro/app/users"
 	"github.com/teddys48/kmpro/middleware"
@@ -77,6 +78,10 @@ func App(config *AppConfig) {
 	menuUsecase := menu.NewUseCase(config.DB, config.Validate, menuRepo, config.Config, config.Redis)
 	menuHandler := menu.NewHandler(menuUsecase)
 
+	roleRepo := role.Newrepository(config.Config)
+	roleUsecase := role.NewUseCase(config.DB, config.Validate, roleRepo, config.Config, config.Redis)
+	roleHandler := role.NewHandler(roleUsecase)
+
 	routeConfig := route.RouteConfig{
 		AuthMiddleware: authMiddleware,
 		Route:          config.Route,
@@ -84,6 +89,7 @@ func App(config *AppConfig) {
 		AuthHandler:    authHandler,
 		UsersHandler:   userHandler,
 		MenuHandler:    menuHandler,
+		RoleHandler:    roleHandler,
 	}
 
 	routeConfig.Setup()

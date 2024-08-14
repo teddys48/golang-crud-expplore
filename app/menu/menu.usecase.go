@@ -263,7 +263,7 @@ func (u *useCase) Delete(r *http.Request) *helper.WebResponse[interface{}] {
 		UpdatedOn: time.Now(),
 	}
 
-	err = u.Repository.Update(tx, &dataUpdate, id)
+	err = u.Repository.Delete(tx, &dataUpdate, id)
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
 		slog.Warnf("[%+v] [USERS Update] RESPONSE : %+v", session, err.Error())

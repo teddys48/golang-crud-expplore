@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/teddys48/kmpro/app/auth"
 	"github.com/teddys48/kmpro/app/menu"
+	"github.com/teddys48/kmpro/app/role"
 	"github.com/teddys48/kmpro/app/test"
 	"github.com/teddys48/kmpro/app/users"
 )
@@ -17,6 +18,7 @@ type RouteConfig struct {
 	AuthHandler    auth.AuthHandler
 	UsersHandler   users.Handler
 	MenuHandler    menu.Handler
+	RoleHandler    role.Handler
 }
 
 func (c *RouteConfig) Setup() {
@@ -40,6 +42,13 @@ func (c *RouteConfig) AuthRoute() {
 	menuRoute.Post("/api/menu/create", c.MenuHandler.Create)
 	menuRoute.Post("/api/menu/update", c.MenuHandler.Update)
 	menuRoute.Get("/api/menu/delete", c.MenuHandler.Delete)
+
+	roleRoute := c.Route.With(c.AuthMiddleware)
+	roleRoute.Get("/api/role", c.RoleHandler.All)
+	roleRoute.Get("/api/role/find", c.RoleHandler.Find)
+	roleRoute.Post("/api/role/create", c.RoleHandler.Create)
+	roleRoute.Post("/api/role/update", c.RoleHandler.Update)
+	roleRoute.Get("/api/role/delete", c.RoleHandler.Delete)
 }
 
 func (c *RouteConfig) GuestRoute() {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gookit/slog"
 	"github.com/teddys48/kmpro/config"
 	"github.com/teddys48/kmpro/helper"
 )
@@ -13,6 +14,7 @@ func StartNonTLSServer(port string) {
 	if err != nil {
 		panic(err)
 	} else {
+		slog.Infof("Starting server on port %v", port)
 		fmt.Printf("Starting server on port %v", port)
 	}
 }
