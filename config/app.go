@@ -10,6 +10,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
 	"github.com/teddys48/kmpro/app/auth"
+	"github.com/teddys48/kmpro/app/menu"
 	"github.com/teddys48/kmpro/app/test"
 	"github.com/teddys48/kmpro/app/users"
 	"github.com/teddys48/kmpro/middleware"
@@ -72,12 +73,17 @@ func App(config *AppConfig) {
 	userUsecase := users.NewUseCase(config.DB, config.Validate, userRepo, config.Config, config.Redis)
 	userHandler := users.NewHandler(userUsecase)
 
+	menuRepo := menu.Newrepository(config.Config)
+	menuUsecase := menu.NewUseCase(config.DB, config.Validate, menuRepo, config.Config, config.Redis)
+	menuHandler := menu.NewHandler(menuUsecase)
+
 	routeConfig := route.RouteConfig{
 		AuthMiddleware: authMiddleware,
 		Route:          config.Route,
 		TestHandler:    testHandler,
 		AuthHandler:    authHandler,
 		UsersHandler:   userHandler,
+		MenuHandler:    menuHandler,
 	}
 
 	routeConfig.Setup()

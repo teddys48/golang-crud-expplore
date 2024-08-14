@@ -134,7 +134,7 @@ func (u *useCase) Create(r *http.Request) *helper.WebResponse[interface{}] {
 
 	perusahaanID := int64(*request.PerusahaanID)
 	dataInsert := entity.Users{
-		Code:          "USR" + fmt.Sprint(time.Now().Unix()),
+		Code:          "USER" + fmt.Sprint(time.Now().Unix()),
 		Username:      request.Username,
 		Nip:           request.NIP,
 		CorporationID: &perusahaanID,

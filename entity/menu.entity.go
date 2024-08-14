@@ -9,7 +9,7 @@ type Menu struct {
 	MenuParentID int64     `gorm:"menu_parent_id"`
 	Icon         string    `gorm:"icon"`
 	PathURL      string    `gorm:"path_url"`
-	Sort         string    `gorm:"sort"`
+	Sort         int       `gorm:"sort"`
 	HiddenData   bool      `gorm:"hidden_data"`
 	Description  string    `gorm:"description"`
 	Status       string    `gorm:"status"`
