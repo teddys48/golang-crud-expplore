@@ -59,7 +59,7 @@ func (u authUseCase) Login(r *http.Request) *helper.WebResponse[interface{}] {
 	tx := u.DB.WithContext(r.Context())
 
 	user := new(LoginUsers)
-	err = u.AuthRepository.CheckUsersByUsername(tx, user, request.Username)
+	err = u.AuthRepository.CheckUsersByEmailOrNIP(tx, user, request.EmailOrNIP)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		response = helper.Response("400", "User not found", nil)
 		slog.Warnf("[%+v] [AUTH LOGIN] RESPONSE : %+v", session, err.Error())

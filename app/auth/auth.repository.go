@@ -7,6 +7,7 @@ import (
 
 type AuthRepository interface {
 	CheckUsersByUsername(db *gorm.DB, user *LoginUsers, username string) error
+	CheckUsersByEmailOrNIP(db *gorm.DB, user *LoginUsers, email_or_nip string) error
 }
 
 type authRepository struct {
@@ -24,6 +25,16 @@ func (r authRepository) CheckUsersByUsername(db *gorm.DB, user *LoginUsers, user
 		Select("username", "email", "code", "password", "id").
 		Where("username", username).
 		Where("status", "ACTIVE").
+		First(&user).
+		Scan(user).Error
+}
+
+func (r authRepository) CheckUsersByEmailOrNIP(db *gorm.DB, user *LoginUsers, email_or_nip string) error {
+	return db.Table("users").
+		Select("username", "email", "code", "password", "id").
+		Where("status", "ACTIVE").
+		Where("email", email_or_nip).
+		Or("nip", email_or_nip).
 		First(&user).
 		Scan(user).Error
 }
