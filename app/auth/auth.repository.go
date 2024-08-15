@@ -59,9 +59,8 @@ func (r authRepository) CheckUsersByEmailOrNIP2(db *gorm.DB, user *UsersData, em
 	return db.Table("users").
 		Select(
 			"users.email as email",
-			"role_id",
 			"nip as nip",
-			"nrk",
+			"nrk as nrk",
 			"instance as instansi",
 			"position as jabatan",
 			"full_name as fullname",

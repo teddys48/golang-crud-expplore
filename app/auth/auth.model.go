@@ -32,12 +32,12 @@ type UsersData struct {
 	// Username     string `json:"username"`
 	Email        string  `json:"email"`
 	NIP          *string `json:"nip"`
-	NRK          string  `json:"nrk"`
-	PerusahaanID int     `json:"perusahaan_id"`
-	Instansi     string  `json:"instansi"`
-	Jabatan      string  `json:"jabatan"`
-	Phone        string  `json:"phone"`
-	Fullname     string  `json:"fullname"`
+	NRK          *string `json:"nrk"`
+	PerusahaanID *int    `json:"perusahaan_id"`
+	Instansi     *string `json:"instansi"`
+	Jabatan      *string `json:"jabatan"`
+	Phone        *string `json:"phone"`
+	Fullname     *string `json:"fullname"`
 	Role         string  `json:"role"`
 }
 
