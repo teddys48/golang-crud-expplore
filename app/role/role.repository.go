@@ -51,14 +51,15 @@ func (r *repository) All(db *gorm.DB, data *[]Role) error {
 }
 
 func (r *repository) GetRoleDetailData(db *gorm.DB, data *[]RoleDetailData, role_id int) error {
-	return db.Table("role_detail").
+	return db.Table("menu").
 		Select(
 			"menu.name as name",
-			"menu_path_url as path",
+			"menu.path_url as path",
 			"menu.sort as sort",
 			"role_detail.action as action").
-		Joins("left join menu on menu.id = role_detail.id").
-		Find(&data).
+		Joins("left join role_detail on role_detail.menu_id = menu.id").
+		Where("role_detail.role_id", role_id).
+		First(&data).
 		Scan(data).Error
 }
 
@@ -116,6 +117,13 @@ func (r *repository) UpdateUpdateRole(db *gorm.DB, dataRole *entity.Role, dataRo
 
 	if err := tx.Table("role_detail").
 		Where("role_id", roleID).
+		Delete(&dataRoleDetail).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Table("role_detail").
+		// Where("role_id", roleID).
 		Create(&dataRoleDetail).Error; err != nil {
 		tx.Rollback()
 		return err

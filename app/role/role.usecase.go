@@ -57,15 +57,33 @@ func (u *useCase) All(r *http.Request) *helper.WebResponse[interface{}] {
 		role = nil
 	}
 
+	roleDataMenu := []RoleDataMenu{}
+
 	for _, v := range *role {
 		roleDetail := new([]RoleDetailData)
 		err = u.Repository.GetRoleDetailData(tx, roleDetail, int(v.ID))
-		if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			slog.Infof("[%+v] [ROLE ALL] RESPONSE : %+v", session, err.Error())
+		} else if err != nil {
 			response = helper.Response("500", err.Error(), nil)
 			slog.Warnf("[%+v] [ROLE ALL] RESPONSE : %+v", session, err.Error())
 			return response
 		}
-		v.MenuList = *roleDetail
+
+		data := RoleDataMenu{
+			ID:          v.ID,
+			Code:        v.Code,
+			Name:        v.Name,
+			Description: v.Description,
+			Status:      v.Status,
+			CreatedBy:   v.CreatedBy,
+			CreatedOn:   v.CreatedOn,
+			UpdatedBy:   v.UpdatedBy,
+			UpdatedOn:   v.UpdatedOn,
+			MenuList:    *roleDetail,
+		}
+
+		roleDataMenu = append(roleDataMenu, data)
 	}
 
 	// if err != nil {
@@ -74,8 +92,8 @@ func (u *useCase) All(r *http.Request) *helper.WebResponse[interface{}] {
 	// 	return response
 	// }
 
-	response = helper.Response("00", "success", role)
-	slog.Warnf("[%+v] [ROLE ALL] RESPONSE : %+v", session, response)
+	response = helper.Response("00", "success", roleDataMenu)
+	slog.Infof("[%+v] [ROLE ALL] RESPONSE : %+v", session, response)
 	return response
 }
 

@@ -3,6 +3,19 @@ package role
 import "time"
 
 type Role struct {
+	ID          int64     `json:"id"`
+	Code        string    `json:"code"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Status      string    `json:"status"`
+	CreatedBy   int64     `json:"created_by"`
+	CreatedOn   time.Time `json:"created_on"`
+	UpdatedBy   int64     `json:"updated_by"`
+	UpdatedOn   time.Time `json:"updated_on"`
+	// MenuList    []RoleDetailData `json:"menu_list"`
+}
+
+type RoleDataMenu struct {
 	ID          int64            `json:"id"`
 	Code        string           `json:"code"`
 	Name        string           `json:"name"`

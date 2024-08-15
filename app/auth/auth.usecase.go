@@ -145,7 +145,30 @@ func (u authUseCase) Login(r *http.Request) *helper.WebResponse[interface{}] {
 		return response
 	}
 
-	response = helper.Response("00", "success", LoginResponse{AccessToken: accessToken, RefreshToken: refreshToken})
+	menu := new([]Menu)
+
+	err = u.AuthRepository.GetRoleDetailData(tx, menu, int(user.RoleID))
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		slog.Printf("[%+v] [AUTH LOGIN] RESPONSE : %+v", session, err.Error())
+	} else if err != nil {
+		response = helper.Response("500", err.Error(), nil)
+		slog.Warnf("[%+v] [AUTH LOGIN] RESPONSE : %+v", session, err.Error())
+		return response
+	}
+
+	userData := new(UsersData)
+	err = u.AuthRepository.CheckUsersByEmailOrNIP2(tx, userData, request.EmailOrNIP)
+	// if errors.Is(err, gorm.ErrRecordNotFound) {
+	// 	slog.Printf("[%+v] [AUTH LOGIN] RESPONSE : %+v", session, err.Error())
+	// } else
+	fmt.Println(userData)
+	if err != nil {
+		response = helper.Response("500", err.Error(), nil)
+		slog.Warnf("[%+v] [AUTH LOGIN] RESPONSE : %+v", session, err.Error())
+		return response
+	}
+
+	response = helper.Response("00", "success", LoginResponse{AccessToken: accessToken, RefreshToken: refreshToken, Menu: menu, User: userData})
 	slog.Infof("[%+v] [AUTH LOGIN] RESPONSE : %+v", session, response)
 	return response
 }
