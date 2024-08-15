@@ -48,7 +48,7 @@ func main() {
 	})
 
 	route.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		helper.ReturnResponse(w, "Welcome!")
+		helper.ReturnResponse(w, "Welcomee!")
 	})
 
 	// log.Info("Starting apps...")
