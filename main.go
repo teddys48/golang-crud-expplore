@@ -71,9 +71,9 @@ func main() {
 	// log.Info("Starting apps...")
 	port := viperConfig.GetString("web.port")
 	if viperConfig.GetString("app.env") == "development" {
-		go StartNonTLSServer(port, srv)
+		StartNonTLSServer(port, srv)
 	} else {
-		go StartTLSServer(port, srv)
+		StartTLSServer(port, srv)
 	}
 
 	<-stop
