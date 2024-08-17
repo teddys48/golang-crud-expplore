@@ -10,7 +10,10 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
 	"github.com/teddys48/kmpro/app/auth"
+	"github.com/teddys48/kmpro/app/corporation"
+	"github.com/teddys48/kmpro/app/jobs"
 	"github.com/teddys48/kmpro/app/menu"
+	"github.com/teddys48/kmpro/app/project"
 	"github.com/teddys48/kmpro/app/role"
 	"github.com/teddys48/kmpro/app/test"
 	"github.com/teddys48/kmpro/app/users"
@@ -82,14 +85,29 @@ func App(config *AppConfig) {
 	roleUsecase := role.NewUseCase(config.DB, config.Validate, roleRepo, config.Config, config.Redis)
 	roleHandler := role.NewHandler(roleUsecase)
 
+	corporationRepo := corporation.Newrepository(config.Config)
+	corporationUsecase := corporation.NewUseCase(config.DB, config.Validate, corporationRepo, config.Config, config.Redis)
+	corporationHandler := corporation.NewHandler(corporationUsecase)
+
+	projectRepo := project.Newrepository(config.Config)
+	projectUsecase := project.NewUseCase(config.DB, config.Validate, projectRepo, config.Config, config.Redis)
+	projectHandler := project.NewHandler(projectUsecase)
+
+	jobsRepo := jobs.Newrepository(config.Config)
+	jobsUsecase := jobs.NewUseCase(config.DB, config.Validate, jobsRepo, config.Config, config.Redis)
+	jobsHandler := jobs.NewHandler(jobsUsecase)
+
 	routeConfig := route.RouteConfig{
-		AuthMiddleware: authMiddleware,
-		Route:          config.Route,
-		TestHandler:    testHandler,
-		AuthHandler:    authHandler,
-		UsersHandler:   userHandler,
-		MenuHandler:    menuHandler,
-		RoleHandler:    roleHandler,
+		AuthMiddleware:     authMiddleware,
+		Route:              config.Route,
+		TestHandler:        testHandler,
+		AuthHandler:        authHandler,
+		UsersHandler:       userHandler,
+		MenuHandler:        menuHandler,
+		RoleHandler:        roleHandler,
+		CorporationHandler: corporationHandler,
+		ProjectHandler:     projectHandler,
+		JobsHandler:        jobsHandler,
 	}
 
 	routeConfig.Setup()

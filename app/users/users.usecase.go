@@ -247,19 +247,21 @@ func (u *useCase) Delete(r *http.Request) *helper.WebResponse[interface{}] {
 	id, err := strconv.ParseInt(request, 10, 64)
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
-		slog.Warnf("[%+v] [USERS FIND] RESPONSE : %+v", session, err.Error())
+		slog.Warnf("[%+v] [USERS DELETE] RESPONSE : %+v", session, err.Error())
 		return response
 	}
 
 	users := new(Users)
 	err = u.Repository.CheckUsersByID(tx, users, id)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		users = nil
+		response = helper.Response("400", "User not found", nil)
+		slog.Warnf("[%+v] [USERS DELETE] RESPONSE : %+v", session, response)
+		return response
 	}
 
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
-		slog.Warnf("[%+v] [USERS FIND] RESPONSE : %+v", session, err.Error())
+		slog.Warnf("[%+v] [USERS DELETE] RESPONSE : %+v", session, err.Error())
 		return response
 	}
 
@@ -267,7 +269,7 @@ func (u *useCase) Delete(r *http.Request) *helper.WebResponse[interface{}] {
 	userID, err := strconv.ParseInt(getUserID, 10, 64)
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
-		slog.Warnf("[%+v] [USERS Update] RESPONSE : %+v", session, err.Error())
+		slog.Warnf("[%+v] [USERS DELETE] RESPONSE : %+v", session, err.Error())
 		return response
 	}
 
@@ -280,7 +282,7 @@ func (u *useCase) Delete(r *http.Request) *helper.WebResponse[interface{}] {
 	err = u.Repository.Update(tx, &dataUpdate, id)
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
-		slog.Warnf("[%+v] [USERS Update] RESPONSE : %+v", session, err.Error())
+		slog.Warnf("[%+v] [USERS DELETE] RESPONSE : %+v", session, err.Error())
 		return response
 	}
 

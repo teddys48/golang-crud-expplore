@@ -1,4 +1,4 @@
-package role
+package project
 
 import (
 	"context"
@@ -12,7 +12,6 @@ import (
 	"github.com/gookit/slog"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
-	"github.com/teddys48/kmpro/entity"
 	"github.com/teddys48/kmpro/helper"
 	"gorm.io/gorm"
 )
@@ -49,51 +48,16 @@ func (u *useCase) All(r *http.Request) *helper.WebResponse[interface{}] {
 	session := helper.GenerateRandomString()
 	tx := u.DB.WithContext(r.Context())
 
-	slog.Infof("[%+v] [ROLE ALL] REQUEST : %+v", session, nil)
+	slog.Infof("[%+v] [PROJECT ALL] REQUEST : %+v", session, nil)
 
-	role := new([]Role)
-	err := u.Repository.All(tx, role)
+	data := new([]Project)
+	err := u.Repository.All(tx, data)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		role = nil
+		data = nil
 	}
 
-	roleDataMenu := []RoleDataMenu{}
-
-	for _, v := range *role {
-		roleDetail := new([]RoleDetailData)
-		err = u.Repository.GetRoleDetailData(tx, roleDetail, int(v.ID))
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			slog.Infof("[%+v] [ROLE ALL] RESPONSE : %+v", session, err.Error())
-		} else if err != nil {
-			response = helper.Response("500", err.Error(), nil)
-			slog.Warnf("[%+v] [ROLE ALL] RESPONSE : %+v", session, err.Error())
-			return response
-		}
-
-		data := RoleDataMenu{
-			ID:          v.ID,
-			Code:        v.Code,
-			Name:        v.Name,
-			Description: v.Description,
-			Status:      v.Status,
-			CreatedBy:   v.CreatedBy,
-			CreatedOn:   v.CreatedOn,
-			UpdatedBy:   v.UpdatedBy,
-			UpdatedOn:   v.UpdatedOn,
-			MenuList:    *roleDetail,
-		}
-
-		roleDataMenu = append(roleDataMenu, data)
-	}
-
-	// if err != nil {
-	// 	response = helper.Response("500", err.Error(), nil)
-	// 	slog.Warnf("[%+v] [ROLE ALL] RESPONSE : %+v", session, err.Error())
-	// 	return response
-	// }
-
-	response = helper.Response("00", "success", roleDataMenu)
-	slog.Infof("[%+v] [ROLE ALL] RESPONSE : %+v", session, response)
+	response = helper.Response("00", "success", data)
+	slog.Infof("[%+v] [PROJECT ALL] RESPONSE : %+v", session, response)
 	return response
 }
 
@@ -103,31 +67,31 @@ func (u *useCase) Find(r *http.Request) *helper.WebResponse[interface{}] {
 	tx := u.DB.WithContext(r.Context())
 	request := r.URL.Query().Get("id")
 
-	slog.Infof("[%+v] [ROLE FIND] REQUEST : %+v", session, request)
+	slog.Infof("[%+v] [PROJECT FIND] REQUEST : %+v", session, request)
 
 	id, err := strconv.ParseInt(request, 10, 64)
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
-		slog.Warnf("[%+v] [ROLE FIND] RESPONSE : %+v", session, err.Error())
+		slog.Warnf("[%+v] [PROJECT FIND] RESPONSE : %+v", session, err.Error())
 		return response
 	}
 
-	users := new(Role)
-	err = u.Repository.CheckByID(tx, users, id)
+	data := new(Project)
+	err = u.Repository.CheckByID(tx, data, id)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		response = helper.Response("400", "User not found", nil)
-		slog.Warnf("[%+v] [ROLE FIND] RESPONSE : %+v", session, response)
+		response = helper.Response("400", "Data not found", nil)
+		slog.Warnf("[%+v] [PROJECT FIND] RESPONSE : %+v", session, response)
 		return response
 	}
 
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
-		slog.Warnf("[%+v] [ROLE FIND] RESPONSE : %+v", session, err.Error())
+		slog.Warnf("[%+v] [PROJECT FIND] RESPONSE : %+v", session, err.Error())
 		return response
 	}
 
-	response = helper.Response("00", "success", users)
-	slog.Warnf("[%+v] [ROLE FIND] RESPONSE : %+v", session, response)
+	response = helper.Response("00", "success", data)
+	slog.Warnf("[%+v] [PROJECT FIND] RESPONSE : %+v", session, response)
 	return response
 }
 
@@ -135,50 +99,39 @@ func (u *useCase) Create(r *http.Request) *helper.WebResponse[interface{}] {
 	response := &helper.WebResponse[interface{}]{}
 	session := helper.GenerateRandomString()
 	tx := u.DB.WithContext(r.Context())
-	request := new(RoleCreateRequest)
+	request := new(Project)
 
 	err := helper.ValidateRequest(r, u.Validate, request)
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
-		slog.Warnf("[%+v] [ROLE CREATE] RESPONSE : %+v", session, err.Error())
+		slog.Warnf("[%+v] [PROJECT CREATE] RESPONSE : %+v", session, err.Error())
 		return response
 	}
 
-	slog.Infof("[%+v] [ROLE CREATE] REQUEST : %+v", session, request)
+	slog.Infof("[%+v] [PROJECT CREATE] REQUEST : %+v", session, request)
 
 	getUserID := fmt.Sprint(context.Context.Value(r.Context(), helper.GetContextKey()))
 	userID, err := strconv.ParseInt(getUserID, 10, 64)
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
-		slog.Warnf("[%+v] [ROLE CREATE] RESPONSE : %+v", session, err.Error())
+		slog.Warnf("[%+v] [PROJECT CREATE] RESPONSE : %+v", session, err.Error())
 		return response
 	}
 
-	dataRole := entity.Role{
-		Code:        "ROLE" + fmt.Sprint(time.Now().Unix()),
-		Name:        request.Name,
-		Description: request.Description,
-		Status:      "ACTIVE",
-		CreatedBy:   userID,
-		CreatedOn:   time.Now(),
-	}
+	request.CreatedBy = userID
+	request.CreatedOn = time.Now()
+	request.Status = "ACTIVE"
+	request.Code = "PROJECT" + fmt.Sprint(time.Now().Unix())
 
-	dataRoleDetail := []entity.RoleDetail{}
-	for _, v := range request.Menu {
-		dataRoleDetail = append(dataRoleDetail, entity.RoleDetail{MenuID: v.MenuID, Action: v.Action})
-	}
-
-	fmt.Println("cek", dataRoleDetail)
-
-	err = u.Repository.InsertUpdateRole(tx, &dataRole, &dataRoleDetail)
+	err = u.Repository.Create(tx, request)
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
-		slog.Warnf("[%+v] [ROLE CREATE] RESPONSE : %+v", session, err.Error())
+		slog.Warnf("[%+v] [PROJECT CREATE] RESPONSE : %+v", session, err.Error())
 		return response
 	}
 
 	response = helper.Response("00", "success", nil)
-	slog.Infof("[%+v] [ROLE CREATE] RESPONSE : %+v", session, response)
+	slog.Infof("[%+v] [PROJECT CREATE] RESPONSE : %+v", session, response)
 	return response
 }
 
@@ -186,30 +139,30 @@ func (u *useCase) Update(r *http.Request) *helper.WebResponse[interface{}] {
 	response := &helper.WebResponse[interface{}]{}
 	session := helper.GenerateRandomString()
 	tx := u.DB.WithContext(r.Context())
-	request := new(RoleCreateRequest)
+	request := new(Project)
 	requestID := r.URL.Query().Get("id")
 
 	err := helper.ValidateRequest(r, u.Validate, request)
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
-		slog.Warnf("[%+v] [ROLE UPDATE] RESPONSE : %+v", session, err.Error())
+		slog.Warnf("[%+v] [PROJECT UPDATE] RESPONSE : %+v", session, err.Error())
 		return response
 	}
 
-	slog.Infof("[%+v] [ROLE UPDATE] REQUEST : %+v", session, request)
+	slog.Infof("[%+v] [PROJECT UPDATE] REQUEST : %+v", session, request)
 
 	id, err := strconv.ParseInt(requestID, 10, 64)
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
-		slog.Warnf("[%+v] [USERS UPDATE] RESPONSE : %+v", session, err.Error())
+		slog.Warnf("[%+v] [PROJECT UPDATE] RESPONSE : %+v", session, err.Error())
 		return response
 	}
 
-	users := new(Role)
-	err = u.Repository.CheckByID(tx, users, id)
+	data := new(Project)
+	err = u.Repository.CheckByID(tx, data, id)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		response = helper.Response("400", "User not found", nil)
-		slog.Warnf("[%+v] [ROLE UPDATE] RESPONSE : %+v", session, response)
+		response = helper.Response("400", "Data not found", nil)
+		slog.Warnf("[%+v] [PROJECT UPDATE] RESPONSE : %+v", session, response)
 		return response
 	}
 
@@ -217,33 +170,24 @@ func (u *useCase) Update(r *http.Request) *helper.WebResponse[interface{}] {
 	userID, err := strconv.ParseInt(getUserID, 10, 64)
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
-		slog.Warnf("[%+v] [ROLE UPDATE] RESPONSE : %+v", session, err.Error())
+		slog.Warnf("[%+v] [PROJECT UPDATE] RESPONSE : %+v", session, err.Error())
 		return response
 	}
 
-	dataRole := entity.Role{
-		// Code:        "ROLE" + fmt.Sprint(time.Now().Unix()),
-		Name:        request.Name,
-		Description: request.Description,
-		Status:      "ACTIVE",
-		UpdatedBy:   userID,
-		UpdatedOn:   time.Now(),
-	}
+	now := time.Now()
 
-	dataRoleDetail := []entity.RoleDetail{}
-	for _, v := range request.Menu {
-		dataRoleDetail = append(dataRoleDetail, entity.RoleDetail{MenuID: v.MenuID, Action: v.Action, RoleID: id})
-	}
+	request.UpdatedBy = &userID
+	request.UpdatedOn = &now
 
-	err = u.Repository.UpdateUpdateRole(tx, &dataRole, &dataRoleDetail, id)
+	err = u.Repository.Update(tx, request, id)
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
-		slog.Warnf("[%+v] [ROLE UPDATE] RESPONSE : %+v", session, err.Error())
+		slog.Warnf("[%+v] [PROJECT UPDATE] RESPONSE : %+v", session, err.Error())
 		return response
 	}
 
 	response = helper.Response("00", "success", nil)
-	slog.Infof("[%+v] [ROLE UPDATE] RESPONSE : %+v", session, response)
+	slog.Infof("[%+v] [PROJECT UPDATE] RESPONSE : %+v", session, response)
 	return response
 }
 
@@ -253,43 +197,53 @@ func (u *useCase) Delete(r *http.Request) *helper.WebResponse[interface{}] {
 	tx := u.DB.WithContext(r.Context())
 	request := r.URL.Query().Get("id")
 
-	slog.Infof("[%+v] [ROLE DELETE] REQUEST : %+v", session, request)
+	slog.Infof("[%+v] [PROJECT DELETE] REQUEST : %+v", session, request)
 
 	getUserID := fmt.Sprint(context.Context.Value(r.Context(), helper.GetContextKey()))
 	userID, err := strconv.ParseInt(getUserID, 10, 64)
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
-		slog.Warnf("[%+v] [ROLE DELETE] RESPONSE : %+v", session, err.Error())
+		slog.Warnf("[%+v] [PROJECT DELETE] RESPONSE : %+v", session, err.Error())
 		return response
 	}
 
 	id, err := strconv.ParseInt(request, 10, 64)
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
-		slog.Warnf("[%+v] [ROLE DELETE] RESPONSE : %+v", session, err.Error())
+		slog.Warnf("[%+v] [PROJECT DELETE] RESPONSE : %+v", session, err.Error())
 		return response
 	}
 
-	role := entity.Role{
-		Status:    "DELETED",
-		UpdatedBy: userID,
-		UpdatedOn: time.Now(),
+	data := new(Project)
+	err = u.Repository.CheckByID(tx, data, id)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		response = helper.Response("400", "Data not found", nil)
+		slog.Warnf("[%+v] [PROJECT DELETE] RESPONSE : %+v", session, response)
+		return response
 	}
 
-	err = u.Repository.Update(tx, &role, id)
+	now := time.Now()
+
+	dataUpdate := Project{
+		UpdatedBy: &userID,
+		UpdatedOn: &now,
+		Status:    "DELETED",
+	}
+
+	err = u.Repository.Update(tx, &dataUpdate, id)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		response = helper.Response("400", "User not found", nil)
-		slog.Warnf("[%+v] [ROLE DELETE] RESPONSE : %+v", session, response)
+		slog.Warnf("[%+v] [PROJECT DELETE] RESPONSE : %+v", session, response)
 		return response
 	}
 
 	if err != nil {
 		response = helper.Response("500", err.Error(), nil)
-		slog.Warnf("[%+v] [ROLE DELETE] RESPONSE : %+v", session, err.Error())
+		slog.Warnf("[%+v] [PROJECT DELETE] RESPONSE : %+v", session, err.Error())
 		return response
 	}
 
 	response = helper.Response("00", "success", nil)
-	slog.Warnf("[%+v] [ROLE DELETE] RESPONSE : %+v", session, response)
+	slog.Warnf("[%+v] [PROJECT DELETE] RESPONSE : %+v", session, response)
 	return response
 }
