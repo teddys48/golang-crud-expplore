@@ -57,7 +57,64 @@ func (u *useCase) All(r *http.Request) *helper.WebResponse[interface{}] {
 		data = nil
 	}
 
-	response = helper.Response("00", "success", data)
+	responseData := []JobsAllResponse{}
+	project := new([]Project)
+	projectID := []int64{}
+	for _, v := range *data {
+
+		projectID = append(projectID, v.ProjectID)
+		// err = u.Repository.GetProjectByID(tx, project, v.ProjectID)
+		// if err != nil {
+		// 	response = helper.Response("500", err.Error(), nil)
+		// 	slog.Warnf("[%+v] [JOBS ALL] RESPONSE : %+v", session, response)
+		// 	return response
+		// }
+		// responseData = append(responseData, JobsAllResponse{
+		// 	ProjectName:                   project.ActivityName,
+		// 	TargetPercentage:              project.TargetPercentage,
+		// 	ProgressPlan:                  project.ProgressPlan,
+		// 	TotalCumulativeProgressPlan:   project.TotalCumulativeProgressPlan,
+		// 	ActualProgress:                project.ActualProgress,
+		// 	TotalCumulativeActualProgress: project.TotalCumulativeActualProgress,
+		// 	Deviation:                     project.Deviation,
+		// 	// JobList:                       data,
+		// })
+	}
+
+	err = u.Repository.GetProjectByID(tx, project, projectID)
+	if err != nil {
+		response = helper.Response("500", err.Error(), nil)
+		slog.Warnf("[%+v] [JOBS ALL] RESPONSE : %+v", session, err.Error())
+		return response
+	}
+
+	for _, v := range *project {
+		err = u.Repository.CheckByProjectID(tx, data, v.ID)
+		if err != nil {
+			response = helper.Response("500", err.Error(), nil)
+			slog.Warnf("[%+v] [JOBS ALL] RESPONSE : %+v", session, err.Error())
+			return response
+		}
+
+		responseData = append(responseData, JobsAllResponse{
+			ProjectName:                   v.ActivityName,
+			ProgressPlan:                  v.ProgressPlan,
+			TargetPercentage:              v.TargetPercentage,
+			TotalCumulativeProgressPlan:   v.TotalCumulativeActualProgress,
+			ActualProgress:                v.ActualProgress,
+			TotalCumulativeActualProgress: v.TotalCumulativeProgressPlan,
+			Deviation:                     v.Deviation,
+			JobList:                       data,
+		})
+	}
+
+	// for _, v := range responseData {
+	// 	err = u.Repository.CheckByID(tx, data, v.)
+	// }
+
+	// responseData.JobList = data
+
+	response = helper.Response("00", "success", responseData)
 	slog.Infof("[%+v] [JOBS ALL] RESPONSE : %+v", session, response)
 	return response
 }
@@ -284,16 +341,27 @@ func (u *useCase) Approve(r *http.Request) *helper.WebResponse[interface{}] {
 
 	now := time.Now()
 
-	dataUpdate := Jobs{
-		ApprovedBy: &userID,
-		ApprovedOn: &now,
-	}
-
-	err = u.Repository.Update(tx, &dataUpdate, id)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		response = helper.Response("400", "User not found", nil)
-		slog.Warnf("[%+v] [JOBS APPROVE] RESPONSE : %+v", session, response)
-		return response
+	dataUpdate := new(Jobs)
+	if data.ApprovedBy != nil {
+		fmt.Println("cek1")
+		err = u.Repository.Disapprove(tx, dataUpdate, id)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			response = helper.Response("400", "User not found", nil)
+			slog.Warnf("[%+v] [JOBS APPROVE] RESPONSE : %+v", session, response)
+			return response
+		}
+	} else {
+		fmt.Println("cek2")
+		dataUpdate = &Jobs{
+			ApprovedBy: &userID,
+			ApprovedOn: &now,
+		}
+		err = u.Repository.Update(tx, dataUpdate, id)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			response = helper.Response("400", "User not found", nil)
+			slog.Warnf("[%+v] [JOBS APPROVE] RESPONSE : %+v", session, response)
+			return response
+		}
 	}
 
 	if err != nil {
